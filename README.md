@@ -1,3 +1,9 @@
+# ⚠️ WARNING: Still Error / Under Development
+
+> **Status:** This project is still in development and may contain errors. Use at your own risk.
+
+---
+
 # AI-Scan-PDF: Local-Inference Spec Analyzer
 
 [![GitHub](https://img.shields.io/github/license/tps2015gh/scan_pdf_thai)](https://github.com/tps2015gh/scan_pdf_thai/blob/main/LICENSE)
