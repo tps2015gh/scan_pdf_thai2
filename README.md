@@ -1,14 +1,96 @@
 # AI-Scan-PDF: Local-Inference Spec Analyzer
 
-## 🌟 Vision & Roles
-This project is a collaborative effort between human intelligence and artificial intelligence to create a secure, private, and powerful document analysis tool.
+[![GitHub](https://img.shields.io/github/license/tps2015gh/scan_pdf_thai)](https://github.com/tps2015gh/scan_pdf_thai/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![GPT4All](https://img.shields.io/badge/GPT4All-v3.9.0+-green.svg)](https://gpt4all.io/)
 
-*   **Human (You):** The **Visionary Owner & Director**. You provide the domain expertise, project requirements, and the specific hardware context (Optiplex 3070). Your role is to guide the high-level direction and validate the results against real-world needs.
-*   **AI (Security Agent):** The **Technical Architect & Engineer**. Designs the pipeline, solves library dependencies, implements the RAG (Retrieval-Augmented Generation) logic, and ensures the system runs efficiently on local hardware.
+**A privacy-first, local AI document analysis system for Thai and English PDFs.**
+
+🔗 **Repository:** https://github.com/tps2015gh/scan_pdf_thai
+
+---
+
+## 👥 Team & Roles
+
+This project is a collaborative effort between human intelligence and artificial intelligence.
+
+### 🧑 Human Team Member
+**Name:** tps2015gh (Project Owner)  
+**Role:** Visionary Owner & Director
+
+#### Responsibilities:
+- ✅ Define project vision and requirements
+- ✅ Provide domain expertise (Thai government documents, SRS specifications)
+- ✅ Specify hardware constraints and environment (Optiplex 3070, Windows 11)
+- ✅ Validate AI outputs against real-world needs
+- ✅ Make high-level architectural decisions
+- ✅ Test and provide feedback on system behavior
+- ✅ Maintain and deploy the system in production environment
+
+#### Direction Provided:
+- "Build a local-first AI pipeline that runs on office hardware"
+- "Ensure privacy - no cloud API for sensitive documents"
+- "Support Thai language documents with proper text processing"
+- "Create comprehensive documentation and security scanning"
+- "Enable easy model switching without code changes"
+
+---
+
+### 🤖 AI Team Member
+**Name:** AI Assistant (Qwen-based)  
+**Role:** Technical Architect & Lead Engineer
+
+#### Responsibilities:
+- ✅ Design system architecture (RAG pipeline, vector search)
+- ✅ Implement all Python code (parsing, embedding, querying)
+- ✅ Solve library dependencies and compatibility issues
+- ✅ Create security scanning and testing tools
+- ✅ Write comprehensive documentation (12+ guide files)
+- ✅ Optimize for specified hardware (8GB RAM, CPU-only)
+- ✅ Provide troubleshooting and debugging support
+- ✅ Generate configuration management tools
+
+#### Technical Contributions:
+- Multi-backend support (GPT4All, Ollama, LM Studio)
+- Fallback embedding system (works without Python libraries)
+- Security agent for data leak prevention
+- Test agent for automated testing (32 tests)
+- Configuration manager for easy model switching
+- Complete documentation suite
+
+---
+
+### 🤝 Collaboration Model
+```
+Human (tps2015gh)                    AI (Assistant)
+     │                                    │
+     │── Define Requirements ────────────▶│
+     │                                    │
+     │◄────── Design Architecture ────────│
+     │                                    │
+     │── Provide Feedback ───────────────▶│
+     │                                    │
+     │◄────── Implement Code ─────────────│
+     │                                    │
+     │── Test & Validate ────────────────▶│
+     │                                    │
+     │◄────── Fix Issues ─────────────────│
+     │                                    │
+     │── Deploy & Maintain ──────────────▶│
+```
+
+---
+
+## 🌟 Project Vision
+
+**Goal:** Create a secure, private, and powerful document analysis tool that runs entirely on local office hardware.
+
+**Philosophy:** "Knowledge without Exposure" - Extract insights from documents without sending sensitive data to the cloud.
 
 ---
 
 ## 🧠 The Theory of Local RAG (Retrieval-Augmented Generation)
+
 The core philosophy of this project is **"Knowledge without Exposure."**
 
 1.  **Semantic Chunking:** Unlike humans who read start-to-finish, the AI treats the PDF as a "Lego set." We break 200+ pages into 206 "bricks" (chunks).
