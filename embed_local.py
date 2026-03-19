@@ -14,65 +14,43 @@ def load_config():
 
 CONFIG = load_config()
 
-# GPT4All Local API Server Settings
-API_BASE_URL = CONFIG.get('gpt4all', {}).get('api_base_url', 'http://localhost:4891')
+# Get backend configuration
+BACKEND_TYPE = CONFIG.get('backend', {}).get('type', 'gpt4all')
+API_BASE_URL = CONFIG.get('backend', {}).get('api_base_url', 'http://localhost:4891')
 EMBEDDING_MODEL = CONFIG.get('models', {}).get('embedding_model', 'Qwen/Qwen3-Embedding-0.6B-GGUF')
 
-def get_embedding_with_api(text, use_chat_endpoint=False):
+print(f"\n[ℹ] Using backend: {BACKEND_TYPE.upper()}")
+
+def get_embedding_with_api(text):
     """
-    Try to get embedding using GPT4All's available endpoints.
-    Since GPT4All v3.9.0 doesn't have native embedding API,
-    we can use a workaround with the chat endpoint.
+    Get embedding using configured backend API.
+    Supports GPT4All, Ollama, LM Studio, and other OpenAI-compatible APIs.
     """
-    if not use_chat_endpoint:
-        # Try standard embedding endpoints
-        endpoints = [
-            ("/v1/embeddings", "input"),
-            ("/api/embedding", "prompt"),
-        ]
-        
-        for endpoint, input_key in endpoints:
-            try:
-                response = requests.post(
-                    f"{API_BASE_URL}{endpoint}",
-                    json={"model": EMBEDDING_MODEL, input_key: text},
-                    timeout=30
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    embedding = data.get("embedding") or data.get("data", [{}])[0].get("embedding", [])
-                    if embedding:
-                        return embedding
-            except:
-                continue
-    
-    # Fallback: Use chat endpoint to get embedding representation
-    # This asks the model to output embedding-like features
     try:
-        response = requests.post(
-            f"{API_BASE_URL}/v1/chat/completions",
-            json={
-                "model": "qwen3-8b",
-                "messages": [
-                    {"role": "system", "content": "You are an embedding generator. Output a 384-dimensional vector as a JSON array."},
-                    {"role": "user", "content": f"Generate a semantic vector representation of this text (output ONLY a JSON array of 384 numbers between -1 and 1): {text[:500]}"}
-                ],
-                "stream": False,
-                "max_tokens": 1000,
-                "temperature": 0.0
-            },
-            timeout=60
-        )
+        # Different backends use different endpoints
+        if BACKEND_TYPE == 'ollama':
+            # Ollama uses /api/embeddings with 'prompt'
+            response = requests.post(
+                f"{API_BASE_URL}/api/embeddings",
+                json={"model": EMBEDDING_MODEL, "prompt": text},
+                timeout=30
+            )
+        else:
+            # OpenAI-compatible (GPT4All, LM Studio, etc.) use /v1/embeddings with 'input'
+            response = requests.post(
+                f"{API_BASE_URL}/v1/embeddings",
+                json={"model": EMBEDDING_MODEL, "input": text},
+                timeout=30
+            )
+        
         if response.status_code == 200:
-            import re
-            content = response.json()["choices"][0]["message"]["content"]
-            # Try to extract JSON array from response
-            match = re.search(r'\[.*?\]', content, re.DOTALL)
-            if match:
-                embedding = json.loads(match.group())
-                if isinstance(embedding, list) and len(embedding) > 0:
-                    return embedding
-    except:
+            data = response.json()
+            # Handle different response formats
+            embedding = data.get("embedding") or data.get("data", [{}])[0].get("embedding", [])
+            if embedding:
+                return embedding
+    
+    except Exception as e:
         pass
     
     return None
