@@ -1,0 +1,81 @@
+{
+  "_comment": "AI Scan PDF - Configuration File",
+  "_description": "Edit this file to change models and settings without modifying code",
+  
+  "gpt4all": {
+    "_comment": "GPT4All API Server Settings",
+    "api_base_url": "http://localhost:4891",
+    "api_timeout": 30
+  },
+  
+  "models": {
+    "_comment": "Model Configuration - Change these to use different models",
+    "_note": "Model names must match what's loaded in GPT4All app",
+    
+    "llm_model": "qwen3-8b",
+    "llm_model_full": "unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
+    "llm_description": "Main LLM for Thai/English chat",
+    
+    "embedding_model": "Qwen/Qwen3-Embedding-0.6B-GGUF",
+    "embedding_description": "Embedding model for vector search",
+    
+    "alternative_models": {
+      "_comment": "Alternative models you can switch to",
+      "llm_alternatives": [
+        "qwen2.5-7b-instruct",
+        "bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF",
+        "Llama-3.2-1B-Instruct-Q4_0.gguf"
+      ],
+      "embedding_alternatives": [
+        "all-MiniLM-L6-v2",
+        "paraphrase-multilingual-MiniLM-L12-v2"
+      ]
+    }
+  },
+  
+  "generation": {
+    "_comment": "LLM Generation Settings",
+    "max_tokens": 2000,
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "stream": false
+  },
+  
+  "embedding": {
+    "_comment": "Embedding Settings",
+    "dimensions": 384,
+    "use_fallback": true,
+    "fallback_method": "semantic_hash"
+  },
+  
+  "search": {
+    "_comment": "Vector Search Settings",
+    "top_k_chunks": 3,
+    "min_similarity": 0.1,
+    "use_keyword_fallback": true
+  },
+  
+  "paths": {
+    "_comment": "File Path Configuration",
+    "pdf_input": "PDF_Input",
+    "temp_output": "Temp_Output",
+    "learning_db_output": "LearningDb_Output",
+    "chunks": "Temp_Output/chunks",
+    "vector_db": "LearningDb_Output/vector_db.json"
+  },
+  
+  "parsing": {
+    "_comment": "PDF Parsing Settings",
+    "chunk_size": 4000,
+    "chunk_overlap": 500,
+    "normalize_thai": true
+  },
+  
+  "ui": {
+    "_comment": "User Interface Settings",
+    "show_welcome": true,
+    "show_help_on_start": true,
+    "color_output": true,
+    "language": "th"
+  }
+}

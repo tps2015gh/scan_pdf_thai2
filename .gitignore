@@ -1,0 +1,220 @@
+# =============================================================================
+# AI Scan PDF - Git Ignore for GitHub Upload
+# Protects sensitive data, learning materials, and outputs
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# INPUT DATA (Sensitive - Never Upload)
+# -----------------------------------------------------------------------------
+# PDF input files and folders
+PDF_Input/
+*.pdf
+
+# Any document inputs
+docs_input/
+documents/
+input_docs/
+
+# -----------------------------------------------------------------------------
+# OUTPUT DATA (Generated - Can Regenerate)
+# -----------------------------------------------------------------------------
+# Temporary processing output
+Temp_Output/
+temp_output/
+tmp/
+tmp_output/
+
+# Learning database and embeddings
+LearningDb_Output/
+learning_db/
+embeddings/
+
+# Chunked data
+chunks/
+chunked_data/
+text_chunks/
+
+# OCR outputs
+*_ocr_output*
+ocr_results/
+
+# Vector databases
+vector_db.json
+*.vector.json
+*.embeddings.json
+faiss_index/
+*.faiss
+
+# -----------------------------------------------------------------------------
+# GENERATED FILES (Can Regenerate)
+# -----------------------------------------------------------------------------
+# All JSON data files (except config)
+*_data.json
+*_cache.json
+*.log
+
+# Report outputs
+reports/
+output_reports/
+analysis_results/
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION (May Contain Secrets)
+# -----------------------------------------------------------------------------
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# Config files with potential secrets
+config.local.json
+config.private.json
+secrets.json
+credentials.json
+*.key
+*.pem
+
+# API keys and tokens
+api_keys.txt
+tokens/
+
+# -----------------------------------------------------------------------------
+# PYTHON
+# -----------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.python-version
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# -----------------------------------------------------------------------------
+# OS
+# -----------------------------------------------------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+
+# -----------------------------------------------------------------------------
+# MODEL FILES (Large - Download Separately)
+# -----------------------------------------------------------------------------
+# GGUF model files
+*.gguf
+*.gguf.*
+models/
+model_cache/
+
+# GPT4All cache
+~/.cache/gpt4all/
+gpt4all_cache/
+
+# Ollama models
+~/.ollama/
+ollama_models/
+
+# -----------------------------------------------------------------------------
+# LOGS AND DEBUG
+# -----------------------------------------------------------------------------
+logs/
+*.log
+debug/
+trace/
+dumps/
+
+# -----------------------------------------------------------------------------
+# BACKUP FILES
+# -----------------------------------------------------------------------------
+*.bak
+*.backup
+*.old
+*_backup/
+
+# -----------------------------------------------------------------------------
+# SECURITY SCANS
+# -----------------------------------------------------------------------------
+security_reports/
+leak_reports/
+audit_results/
+
+# -----------------------------------------------------------------------------
+# EXCEPTIONS (Files TO upload)
+# -----------------------------------------------------------------------------
+# Keep these tracked:
+# - README.md
+# - LICENSE
+# - *.py (source code)
+# - MDFile/ (documentation)
+# - HTMLFile/ (user guides)
+# - requirements.txt (if exists)
+# - .gitignore (this file)

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือการใช้งานระบบวิเคราะห์เอกสาร PDF ด้วย AI (Local RAG)</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffecb5;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 5px solid #c3e6cb;
+            padding: 15px;
+            margin: 20px 0;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>คู่มือการใช้งานระบบ Local-Inference PDF Spec Analyzer</h1>
+        <p>ระบบนี้ถูกออกแบบมาเพื่อวิเคราะห์เอกสาร PDF ขนาดใหญ่ (เช่น SRS หรือเอกสารความต้องการผู้ใช้) โดยประมวลผลภายในเครื่อง (Local) ทั้งหมด เพื่อความเป็นส่วนตัวและความปลอดภัยของข้อมูล</p>
+
+        <h2>1. โครงสร้างของระบบ (Architecture)</h2>
+        <ul>
+            <li><strong>Data Ingestion:</strong> ใช้ <code>parse_and_chunk.py</code> เพื่ออ่าน PDF และแบ่งข้อมูลเป็นส่วนเล็กๆ (Chunks)</li>
+            <li><strong>Vector Storage:</strong> ใช้ <code>embed_local.py</code> เพื่อแปลงข้อความเป็น Vector ผ่าน Ollama</li>
+            <li><strong>Inference Loop:</strong> ใช้ <code>main.py</code> สำหรับการค้นหาข้อมูลที่เกี่ยวข้องและตอบคำถามด้วย AI</li>
+        </ul>
+
+        <h2>2. ข้อกำหนดของระบบ (Requirements)</h2>
+        <div class="warning">
+            <strong>สำคัญมาก:</strong> จากการตรวจสอบ พบว่าเครื่องของคุณใช้ Python 32-bit ซึ่งมีข้อจำกัดด้านหน่วยความจำ (RAM 2GB-4GB) แนะนำให้ติดตั้ง <strong>Python 64-bit (เวอร์ชัน 3.10 ขึ้นไป)</strong> เพื่อประสิทธิภาพสูงสุด
+        </div>
+        <ul>
+            <li><strong>Hardware:</strong> Optiplex 3070 (Windows 11)</li>
+            <li><strong>Software:</strong> <a href="https://ollama.com/">Ollama</a> สำหรับรันโมเดลภาษา</li>
+            <li><strong>AI Models:</strong> 
+                <ul>
+                    <li><code>qwen2.5-coder:7b</code> (สำหรับการวิเคราะห์ Code และ Spec)</li>
+                    <li><code>nomic-embed-text</code> (สำหรับการสร้าง Vector ค้นหาข้อมูล)</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>3. ขั้นตอนการติดตั้งและเตรียมข้อมูล</h2>
+        <h3>ขั้นตอนที่ 1: ติดตั้งโมเดลใน Ollama</h3>
+        <pre>ollama pull qwen2.5-coder:7b
+ollama pull nomic-embed-text</pre>
+
+        <h3>ขั้นตอนที่ 2: รันสคริปต์เตรียมข้อมูล</h3>
+        <ol>
+            <li><strong>แยกข้อความจาก PDF:</strong>
+                <pre>python parse_and_chunk.py</pre>
+                <em>สคริปต์จะสร้างโฟลเดอร์ <code>chunks/</code> เก็บไฟล์ Markdown แยกตามหน้า</em>
+            </li>
+            <li><strong>สร้างฐานข้อมูล Vector:</strong>
+                <pre>python embed_local.py</pre>
+                <em>สคริปต์จะส่งข้อมูลไปให้ Ollama เพื่อสร้างไฟล์ <code>vector_db.json</code></em>
+            </li>
+        </ol>
+
+        <h2>4. การใช้งานระบบสอบถาม (RAG)</h2>
+        <p>รันไฟล์หลักเพื่อเริ่มการสนทนากับ AI:</p>
+        <pre>python main.py</pre>
+        <div class="success">
+            <strong>ตัวอย่างคำถาม:</strong> "ระบบมี Requirement ในการเชื่อมต่อฐานข้อมูลอย่างไร?" หรือ "ช่วยสรุปฟังก์ชันการทำงานของโมดูล A ในเอกสาร SRS นี้"
+        </div>
+
+        <h2>5. เทคนิคพิเศษสำหรับการใช้งานบน Optiplex 3070</h2>
+        <ul>
+            <li><strong>Context Optimization:</strong> ระบบจะเลือกส่งเฉพาะส่วนที่เกี่ยวข้อง (Top 3 Chunks) ไปให้ AI เพื่อไม่ให้เครื่องทำงานหนักเกินไป</li>
+            <li><strong>Memory Safety:</strong> สคริปต์มีการทำ Garbage Collection ทุกครั้งหลังประมวลผลหน้า PDF เพื่อลดการค้างของแรม</li>
+            <li><strong>WSL2 Support:</strong> หากต้องการความเร็วที่มากขึ้น แนะนำให้รัน Ollama บน WSL2 (Ubuntu) ใน Windows 11</li>
+        </ul>
+
+        <hr>
+        <p style="text-align: center; color: #7f8c8d;">&copy; 2026 Local-First AI Pipeline Project</p>
+    </div>
+</body>
+</html>

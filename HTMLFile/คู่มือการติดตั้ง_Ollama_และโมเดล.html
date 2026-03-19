@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือการแก้ปัญหาการติดตั้ง Ollama และการดาวน์โหลดโมเดล</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; text-align: center; }
+        h2 { color: #202124; margin-top: 30px; border-left: 5px solid #1a73e8; padding-left: 15px; }
+        .option-box {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            background-color: #ffffff;
+        }
+        .option-title { font-weight: bold; font-size: 1.2em; color: #1a73e8; margin-bottom: 10px; display: block; }
+        pre {
+            background-color: #202124;
+            color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+        }
+        code { color: #d93025; background: #fdf2f2; padding: 2px 5px; border-radius: 4px; }
+        .highlight { color: #1a73e8; font-weight: bold; }
+        .important { background-color: #fff3cd; padding: 10px; border-radius: 5px; border-left: 5px solid #ffc107; margin: 15px 0; }
+        .link-btn {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .link-btn:hover { background-color: #1557b0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ คู่มือการติดตั้งและแก้ปัญหาการดาวน์โหลดโมเดล Ollama</h1>
+        <p>หากคุณพบปัญหา <code>max retries exceeded</code> หรือ <code>Connection failed</code> ขณะรันคำสั่ง <code>ollama pull</code> ในออฟฟิศ แสดงว่าเครือข่ายของบริษัทอาจมีการบล็อกการดาวน์โหลดไฟล์ขนาดใหญ่จาก Cloudflare/AWS</p>
+
+        <div class="important">
+            <strong>คำแนะนำก่อนเริ่ม:</strong> ตรวจสอบให้แน่ใจว่าคุณได้ปิดและเปิดโปรแกรม Ollama ใหม่หลังจากแก้ไขการตั้งค่าใดๆ
+        </div>
+
+        <!-- Option 1 -->
+        <div class="option-box">
+            <span class="option-title">วิธีที่ 1: ลองดาวน์โหลดโมเดลขนาดเล็ก (เพื่อทดสอบการเชื่อมต่อ)</span>
+            <p>บางครั้งปัญหาเกิดจากขนาดไฟล์ที่ใหญ่เกินไป ลองใช้โมเดลขนาดเล็ก (1.5B) เพื่อทดสอบว่าเครือข่ายอนุญาตให้ดาวน์โหลดหรือไม่:</p>
+            <pre>ollama pull qwen2.5-coder:1.5b</pre>
+            <p>หากวิธีนี้ผ่าน แสดงว่าเครือข่ายของคุณอนุญาตการเชื่อมต่อ แต่ไฟล์ 7B อาจใหญ่เกินไปจนหลุด (Timeout)</p>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="option-box">
+            <span class="option-title">วิธีที่ 2: การดาวน์โหลดโมเดลด้วยตัวเอง (วิธีที่แนะนำที่สุดสำหรับออฟฟิศ)</span>
+            <p>หาก <code>ollama pull</code> ไม่ทำงาน ให้ใช้ Browser (Chrome/Edge) ดาวน์โหลดไฟล์โดยตรงจาก Hugging Face:</p>
+            <ol>
+                <li>ดาวน์โหลดไฟล์โมเดล GGUF (แนะนำ Q4_K_M):
+                    <br>
+                    <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf" class="link-btn">ดาวน์โหลด Qwen2.5-Coder-7B (4.7 GB)</a>
+                </li>
+                <li>บันทึกไฟล์ไว้ในโฟลเดอร์โปรเจกต์ <code>D:\dev\ai_scan_pdf</code></li>
+                <li>สร้างไฟล์ข้อความใหม่ชื่อ <code>Modelfile</code> (ไม่มีนามสกุล) ในโฟลเดอร์เดียวกัน และพิมพ์ข้อความนี้ลงไป:
+                    <pre>FROM "./qwen2.5-coder-7b-instruct-q4_k_m.gguf"</pre>
+                </li>
+                <li>รันคำสั่งเพื่อนำเข้าโมเดลเข้าสู่ Ollama:
+                    <pre>ollama create qwen2.5-coder:7b -f Modelfile</pre>
+                </li>
+            </ol>
+            <p class="highlight">ดาวน์โหลด Embedding Model เพิ่มเติมด้วยวิธีเดียวกัน:</p>
+            <a href="https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF/resolve/main/nomic-embed-text-v1.5.Q4_K_M.gguf" class="link-btn">ดาวน์โหลด Nomic-Embed (150 MB)</a>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="option-box">
+            <span class="option-title">วิธีที่ 3: ตั้งค่า Proxy (สำหรับเครือข่ายที่มี Proxy Server)</span>
+            <p>หากบริษัทของคุณบังคับให้ใช้ Proxy ในการออกอินเทอร์เน็ต ให้ตั้งค่าดังนี้:</p>
+            <ol>
+                <li>ไปที่ <strong>Search</strong> ใน Windows พิมพ์คำว่า <code>Environment Variables</code></li>
+                <li>เลือก <strong>Edit the system environment variables</strong></li>
+                <li>คลิกปุ่ม <strong>Environment Variables</strong> ด้านล่าง</li>
+                <li>ในช่อง <strong>System variables</strong> คลิก <strong>New</strong>:
+                    <ul>
+                        <li>Variable name: <code>HTTPS_PROXY</code></li>
+                        <li>Variable value: <code>http://ชื่อพร็อกซี่:พอร์ต</code> (เช่น http://10.1.1.1:8080)</li>
+                    </ul>
+                </li>
+                <li>คลิก OK และ <strong>ปิด-เปิดโปรแกรม Ollama ใน System Tray ใหม่</strong></li>
+            </ol>
+        </div>
+
+        <h2>สรุปคำสั่งที่ต้องใช้เมื่อติดตั้งเสร็จ</h2>
+        <pre># ตรวจสอบโมเดลที่ติดตั้งแล้ว
+ollama list
+
+# รันโปรแกรม AI Assistant
+python main.py</pre>
+
+        <p style="text-align: center; color: #7f8c8d; font-size: 0.8em; margin-top: 50px;">
+            หากต้องการความช่วยเหลือเพิ่มเติม สามารถสอบถามได้ทันที!
+        </p>
+    </div>
+</body>
+</html>

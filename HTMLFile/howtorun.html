@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Run - AI PDF Scan</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        h1 { color: #1a73e8; border-bottom: 2px solid #e8f0fe; padding-bottom: 10px; }
+        h2 { color: #202124; margin-top: 30px; }
+        .step {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .step-number {
+            background: #1a73e8;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        code {
+            background: #f1f3f4;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: #c5221f;
+        }
+        pre {
+            background: #202124;
+            color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .copy-hint {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 10px;
+            color: #9aa0a6;
+        }
+        .note {
+            background: #e8f0fe;
+            border-left: 4px solid #1a73e8;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 How to Run AI PDF Scan</h1>
+        <p>Follow these steps to get your local PDF analyzer up and running on your Optiplex 3070.</p>
+
+        <div class="note">
+            <strong>Prerequisite:</strong> Ensure you have <a href="https://ollama.com/">Ollama</a> installed and running.
+        </div>
+
+        <h2>Step 1: Install Models</h2>
+        <div class="step">
+            <div class="step-number">1</div>
+            <div>
+                Open your terminal (PowerShell or CMD) and run:
+                <pre><span class="copy-hint">Terminal</span>ollama pull qwen2.5-coder:7b
+ollama pull nomic-embed-text</pre>
+            </div>
+        </div>
+
+        <h2>Step 2: Parse PDF Documents</h2>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div>
+                Extract text from your PDF files into manageable chunks:
+                <pre><span class="copy-hint">Terminal</span>python parse_and_chunk.py</pre>
+            </div>
+        </div>
+
+        <h2>Step 3: Generate Embeddings</h2>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div>
+                Create the vector database (Requires Ollama running):
+                <pre><span class="copy-hint">Terminal</span>python embed_local.py</pre>
+            </div>
+        </div>
+
+        <h2>Step 4: Run the Assistant</h2>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div>
+                Start asking questions about your documents:
+                <pre><span class="copy-hint">Terminal</span>python main.py</pre>
+            </div>
+        </div>
+
+        <div class="note" style="background: #fef7e0; border-left-color: #f9ab00;">
+            <strong>Pro Tip:</strong> If you see character encoding issues, try running <code>chcp 65001</code> in your terminal before running the scripts to enable UTF-8 support.
+        </div>
+    </div>
+</body>
+</html>
