@@ -2,33 +2,40 @@
   "_comment": "AI Scan PDF - Configuration File",
   "_description": "Edit this file to change models and settings without modifying code",
   
+  "backend": {
+    "_comment": "Backend API Settings (ollama, gpt4all, or custom)",
+    "type": "ollama",
+    "api_base_url": "http://localhost:11434",
+    "api_timeout": 120
+  },
+  
   "gpt4all": {
-    "_comment": "GPT4All API Server Settings",
+    "_comment": "DEPRECATED: GPT4All API Server Settings (kept for compatibility)",
     "api_base_url": "http://localhost:4891",
     "api_timeout": 30
   },
   
   "models": {
     "_comment": "Model Configuration - Change these to use different models",
-    "_note": "Model names must match what's loaded in GPT4All app",
+    "_note": "Model names must match what's loaded in Ollama",
     
-    "llm_model": "qwen3-8b",
-    "llm_model_full": "unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
-    "llm_description": "Main LLM for Thai/English chat",
+    "llm_model": "qwen2.5:0.5b",
+    "llm_model_full": "qwen2.5:0.5b",
+    "llm_description": "Lightweight 0.5B model for 4GB RAM notebook",
     
-    "embedding_model": "Qwen/Qwen3-Embedding-0.6B-GGUF",
-    "embedding_description": "Embedding model for vector search",
+    "embedding_model": "nomic-embed-text:latest",
+    "embedding_description": "Nomic embedding model for vector search",
     
     "alternative_models": {
       "_comment": "Alternative models you can switch to",
       "llm_alternatives": [
-        "qwen2.5-7b-instruct",
-        "bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF",
-        "Llama-3.2-1B-Instruct-Q4_0.gguf"
+        "qwen2.5:0.5b",
+        "phi3:mini",
+        "llama3.2:1b"
       ],
       "embedding_alternatives": [
         "all-MiniLM-L6-v2",
-        "paraphrase-multilingual-MiniLM-L12-v2"
+        "paraphrase-multilingual"
       ]
     }
   },

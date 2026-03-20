@@ -17,7 +17,9 @@ def ocr_pdf_page(page, reader):
     return " ".join(result)
 
 def main():
-    pdf_path = os.path.join("PDF_Input", "DOL_FSS_Index.1เอกสารสรุปความต้องการของผู้ใช้งาน_20260131_v2.5.pdf")
+    pdf_path = os.path.join("PDF_Input", "your_scanned_document.pdf")
+    # Replace "your_scanned_document.pdf" with the actual filename of your scanned PDF.
+    # Ensure this file is placed in the 'PDF_Input' directory.
     if not os.path.exists(pdf_path):
         print(f"[!] File not found: {pdf_path}")
         return

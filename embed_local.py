@@ -4,6 +4,11 @@ import requests
 from tqdm import tqdm
 import numpy as np
 
+# Set UTF-8 encoding for Windows console
+import sys
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 # Load configuration
 def load_config():
     config_file = "config.json"
@@ -137,13 +142,13 @@ def main():
     # Test API connection first
     print("[*] Testing embedding API endpoint...")
     test_emb = get_embedding_with_api("ทดสอบ")
-    
+
     if test_emb and len(test_emb) > 10:
-        print("[+] ✓ GPT4All API embedding endpoint is working!")
+        print("[OK] GPT4All API embedding endpoint is working!")
         use_api = True
-        print(f"[+] Vector dimensions: {len(test_emb)}\n")
+        print(f"[OK] Vector dimensions: {len(test_emb)}\n")
     else:
-        print("[!] ✗ GPT4All API embedding endpoint not available")
+        print("[!] GPT4All API embedding endpoint not available")
         print("[!] Using semantic hash fallback (deterministic pseudo-embeddings)")
         print("[!]")
         print("[!] NOTE: For REAL embeddings, install gpt4all Python library:")

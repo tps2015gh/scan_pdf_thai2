@@ -1,8 +1,14 @@
 import json
 import os
 import sys
-import numpy as np
 import requests
+from pythainlp.util import normalize
+import numpy as np # Keep numpy import
+from tqdm import tqdm # Keep tqdm import
+
+# Set UTF-8 encoding for Windows console
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 # Load configuration from config.json
 def load_config():
@@ -15,35 +21,102 @@ def load_config():
 CONFIG = load_config()
 
 # Get backend configuration
-BACKEND_TYPE = CONFIG.get('backend', {}).get('type', 'gpt4all')
-API_BASE_URL = CONFIG.get('backend', {}).get('api_base_url', 'http://localhost:4891')
-LLM_MODEL = CONFIG.get('models', {}).get('llm_model', 'qwen3-8b')
-EMBED_MODEL = CONFIG.get('models', {}).get('embedding_model', 'Qwen/Qwen3-Embedding-0.6B-GGUF')
+BACKEND_TYPE = CONFIG.get('backend', {}).get('type', 'ollama')
+API_BASE_URL = CONFIG.get('backend', {}).get('api_base_url', 'http://localhost:11434')
+LLM_MODEL = CONFIG.get('models', {}).get('llm_model', 'qwen3.5:0.8b')
+EMBEDDING_MODEL = CONFIG.get('models', {}).get('embedding_model', 'nomic-embed-text:latest')
 
 # Generation settings
-MAX_TOKENS = CONFIG.get('generation', {}).get('max_tokens', 2000)
+MAX_TOKENS = CONFIG.get('generation', {}).get('max_tokens', 500) # Reduced tokens for quicker responses
 TEMPERATURE = CONFIG.get('generation', {}).get('temperature', 0.2)
 
 # Search settings
 TOP_K = CONFIG.get('search', {}).get('top_k_chunks', 3)
 
 # Show backend info on startup
-print(f"\n[ℹ] Using backend: {BACKEND_TYPE.upper()}")
+print("\n[INFO] Using backend: " + BACKEND_TYPE.upper())
 
-def get_embedding(text):
-    """Generate embedding using GPT4All API or fallback to hash"""
+def check_ollama_api_status(base_url):
+    """Checks if Ollama API is accessible at the given base URL."""
     try:
-        response = requests.post(
-            f"{API_BASE_URL}/v1/embeddings",
-            json={"model": EMBED_MODEL, "input": text},
-            timeout=30
-        )
-        response.raise_for_status()
-        data = response.json()
-        return data["data"][0]["embedding"]
+        response = requests.get(base_url + "/api/tags", timeout=5)
+        if response.status_code == 200:
+            return True, "Ollama API is accessible."
+        else:
+            return False, "Ollama API returned status code " + str(response.status_code) + "."
+    except requests.exceptions.ConnectionError:
+        return False, "Could not connect to Ollama API. Is Ollama running?"
     except Exception as e:
-        # Fallback to hash-based embedding
-        return generate_semantic_hash(text)
+        return False, "An unexpected error occurred: " + str(e)
+
+def get_embedding_with_api(text):
+    """
+    Get embedding using configured backend API.
+    Supports Ollama, GPT4All, LM Studio, and other OpenAI-compatible APIs.
+    """
+    try:
+        # --- Ollama specific endpoint ---
+        if BACKEND_TYPE == 'ollama':
+            try:
+                # Check Ollama server status first
+                is_running, msg = check_ollama_api_status(API_BASE_URL)
+                if not is_running:
+                    print("[WARN] Ollama check failed: " + msg)
+                    print("[WARN] Falling back to semantic hash.")
+                    return None # Fallback if Ollama not running
+                
+                response = requests.post(
+                    API_BASE_URL + "/api/embeddings",
+                    json={"model": EMBEDDING_MODEL, "prompt": text},
+                    timeout=120 # Increased timeout for embedding generation to 120 seconds
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    embedding = data.get("embedding")
+                    if embedding:
+                        return embedding
+                    else:
+                        print("[!] Ollama API Error: Response OK, but 'embedding' key missing or empty.")
+                        return None # Fallback if structure is wrong
+                else:
+                    print("[!] Ollama API Error: Status " + str(response.status_code))
+                    print("[!] Response content: " + response.text[:500]) # Print some response text for debugging
+                    return None # Fallback
+            except requests.exceptions.RequestException as e:
+                print("[!] Ollama Connection Error: " + str(e))
+                print("[!] Falling back to semantic hash.")
+                return None
+            except Exception as e: # Catch any other unexpected errors
+                print("[ERROR] Unexpected error during Ollama embedding call: " + str(e))
+                return None
+
+        # --- OpenAI-compatible API endpoint (GPT4All, LM Studio, etc.) ---
+        else: # Assumed to be OpenAI-compatible
+            response = requests.post(
+                API_BASE_URL + "/v1/embeddings",
+                json={"model": EMBEDDING_MODEL, "input": text},
+                timeout=120 # Increased timeout for embedding generation to 120 seconds
+            )
+            response.raise_for_status() # Raise an exception for bad status codes
+            data = response.json()
+            # Handle different response formats
+            embedding = data.get("data", [{}])[0].get("embedding", [])
+            if embedding:
+                return embedding
+            else: # Handle case where 'data' might be empty or missing
+                print("[!] API Error: Unexpected response format from /v1/embeddings.")
+                return None
+    
+    except requests.exceptions.Timeout: # Catch specific Timeout error
+        print("[ERROR] API Request Timed Out after 120 seconds.")
+        print("Error: The embedding model took too long to respond. This might be due to system resources or model loading time.")
+        return None
+    except requests.exceptions.RequestException as e:
+        print("[ERROR] API Request Failed: " + str(e))
+        return "Error: Could not connect to the Embedding API. Ensure Ollama is running and the model is loaded."
+    except Exception as e:
+        print("[ERROR] Unexpected error during API call: " + str(e))
+        return "Error: An unexpected issue occurred."
 
 def generate_semantic_hash(text, dimensions=384):
     """Fallback embedding using deterministic hash"""
@@ -78,10 +151,10 @@ def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def search_chunks(query, vector_db, top_k=3):
-    query_emb = get_embedding(query)
+    query_emb = get_embedding_with_api(query) # Calls the corrected get_embedding_with_api
 
     if query_emb and len(vector_db) > 0 and "embedding" in vector_db[0]:
-        print("[*] Performing Deep Vector Search with Embeddings...")
+        print("[INFO] Performing Deep Vector Search with Embeddings...")
         results = []
         for chunk in vector_db:
             sim = cosine_similarity(query_emb, chunk["embedding"])
@@ -89,7 +162,7 @@ def search_chunks(query, vector_db, top_k=3):
         results.sort(key=lambda x: x[0], reverse=True)
         return [x[1] for x in results[:top_k]]
     else:
-        print("[!] Warning: Could not generate query embedding or vector_db empty. Falling back to Keyword Search.")
+        print("[WARN] Could not generate query embedding or vector_db empty. Falling back to Keyword Search.")
         query_words = query.lower().split()
         results = []
         for chunk in vector_db:
@@ -101,202 +174,178 @@ def search_chunks(query, vector_db, top_k=3):
         results.sort(key=lambda x: x[0], reverse=True)
         return [x[1] for x in results[:top_k]]
 
-def query_llm(prompt):
-    """Query the LLM using configured backend API"""
-    try:
-        # Different backends use different endpoints
-        if BACKEND_TYPE == 'ollama':
-            # Ollama uses /api/generate with 'prompt' instead of 'messages'
-            response = requests.post(
-                f"{API_BASE_URL}/api/generate",
-                json={
-                    "model": LLM_MODEL,
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {
-                        "num_predict": MAX_TOKENS,
-                        "temperature": TEMPERATURE
-                    }
-                },
-                timeout=300
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("response", "")
-        
-        else:
-            # OpenAI-compatible (GPT4All, LM Studio, etc.)
-            response = requests.post(
-                f"{API_BASE_URL}/v1/chat/completions",
-                json={
-                    "model": LLM_MODEL,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "stream": False,
-                    "max_tokens": MAX_TOKENS,
-                    "temperature": TEMPERATURE
-                },
-                timeout=300
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data["choices"][0]["message"]["content"]
-    
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 500:
-            return f"[ERROR] Model is not loaded or busy. Please check {BACKEND_TYPE.upper()} app and ensure the model is loaded."
-        return f"Error: HTTP {e.response.status_code}"
-    except requests.exceptions.ConnectionError:
-        return f"[ERROR] Cannot connect to {BACKEND_TYPE.upper()}. Make sure the server is running on {API_BASE_URL}."
-    except Exception as e:
-        return f"Error: {str(e)}"
 
-def check_backend_status():
-    """Check if API backend is accessible"""
+def get_llm_response(prompt, model, max_tokens, temperature, stream=False):
+    """Generate response from LLM using configured backend API."""
     try:
-        # Try to get models list
         if BACKEND_TYPE == 'ollama':
-            response = requests.get(f"{API_BASE_URL}/api/tags", timeout=5)
-        else:
-            response = requests.get(f"{API_BASE_URL}/v1/models", timeout=5)
+            response = requests.post(
+                API_BASE_URL + "/api/generate",
+                json={
+                    "model": model,
+                    "prompt": prompt,
+                    "stream": stream,
+                    "max_tokens": max_tokens,
+                    "temperature": temperature
+                },
+                timeout=240 # Increased timeout for LLM generation
+            )
+        else: # Assume OpenAI-compatible (GPT4All, LM Studio, etc.)
+            response = requests.post(
+                API_BASE_URL + "/v1/chat/completions",
+                json={
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens,
+                    "temperature": temperature,
+                    "stream": stream
+                },
+                timeout=240 # Increased timeout for LLM generation
+            )
         
-        if response.status_code == 200:
-            return True, "API Server is running"
-        return False, f"API returned {response.status_code}"
-    except:
-        return False, "Cannot connect to API Server"
+        response.raise_for_status() # Raise an exception for bad status codes
+
+        data = response.json()
+
+        # Handle different response formats
+        if BACKEND_TYPE == 'ollama':
+            return data.get("response", "Error: No content received.")
+        else: # OpenAI-compatible
+            return data.get("choices", [{}])[0].get("message", {}).get("content", "Error: No content received.")
+
+    except requests.exceptions.Timeout: # Catch specific Timeout error
+        print("[ERROR] API Request Timed Out after 240 seconds.")
+        print("Error: The LLM model took too long to respond. This might be due to system resource limitations (RAM/CPU) or model processing time.")
+        return None
+    except requests.exceptions.RequestException as e:
+        print("[ERROR] API Request Failed: " + str(e))
+        return "Error: Could not connect to the LLM API. Ensure Ollama is running and the model is loaded."
+    except Exception as e:
+        print("[ERROR] Unexpected error during LLM response generation: " + str(e))
+        return "Error: An unexpected issue occurred."
 
 def main():
-    # Step 0: Check backend connection
-    print(f"\n{'='*70}")
-    print("🔍 Checking API Status...")
-    print(f"{'='*70}")
+    # Load config
+    config = load_config()
     
-    api_ok, status_msg = check_backend_status()
-    if api_ok:
-        print(f"[✓] {BACKEND_TYPE.upper()} API: {status_msg}")
-    else:
-        print(f"[!] {BACKEND_TYPE.upper()} API: {status_msg}")
-        print(f"\n⚠️  WARNING: {BACKEND_TYPE.upper()} may not be running properly!")
-        print(f"\n📋 Troubleshooting Steps:")
-        
-        if BACKEND_TYPE == 'gpt4all':
-            print(f"   1. Open GPT4All application")
-            print(f"   2. Go to Settings → Enable 'Local API Server'")
-            print(f"   3. Make sure port is 4891")
-            print(f"   4. Load the model: {LLM_MODEL}")
-        elif BACKEND_TYPE == 'ollama':
-            print(f"   1. Start Ollama: ollama serve")
-            print(f"   2. Pull a model: ollama pull {LLM_MODEL}")
-            print(f"   3. Check: ollama list")
-        elif BACKEND_TYPE == 'lmstudio':
-            print(f"   1. Open LM Studio")
-            print(f"   2. Start Local Server")
-            print(f"   3. Load a model")
-        else:
-            print(f"   1. Check your {BACKEND_TYPE} server is running")
-            print(f"   2. Verify API URL: {API_BASE_URL}")
-        
-        print(f"   5. Try again\n")
+    # --- API Status Check ---
+    print("\n======================================================================")
+    print("Checking API Status...")
+    print("======================================================================")
     
-    vector_db_path = os.path.join("LearningDb_Output", "vector_db.json")
+    api_available = False
+    backend_type = CONFIG.get('backend', {}).get('type', 'ollama') # Default to ollama
+    api_base_url = CONFIG.get('backend', {}).get('api_base_url', 'http://localhost:11434') # Default to ollama port
+
+    if backend_type == 'ollama':
+        try:
+            # Use /api/tags for Ollama check
+            response = requests.get(api_base_url + "/api/tags", timeout=5)
+            if response.status_code == 200:
+                print("[OK] OLLAMA API: API Server is running")
+                api_available = True
+            else:
+                print("[!] OLLAMA API: Cannot connect to API Server (Status: " + str(response.status_code) + ")")
+                print("[WARN] OLLAMA may not be running properly!")
+        except requests.exceptions.RequestException as e:
+            print("[!] OLLAMA API: Cannot connect to API Server")
+            print("[!] Error details: " + str(e))
+            print("[WARN] OLLAMA may not be running properly!")
+    else: # Assume OpenAI-compatible for other backends
+        try:
+            # Use /v1/models to check compatibility
+            response = requests.get(api_base_url + "/v1/models", timeout=5)
+            if response.status_code == 200:
+                print("[OK] Embedding API: API Server is running (OpenAI-compatible)")
+                api_available = True
+            else:
+                print("[!] API: Cannot connect to API Server (Status: " + str(response.status_code) + ")")
+                print("[WARN] API server may not be running properly!")
+        except requests.exceptions.RequestException as e:
+            print("[!] API: Cannot connect to API Server")
+            print("[!] Error details: " + str(e))
+            print("[WARN] API server may not be running properly!")
+
+    if not api_available:
+        print("\n[ERROR] Essential API services are not available. Exiting.")
+        sys.exit(1)
     
+    # --- Load Vector DB ---
+    vector_db_path = config.get('paths', {}).get('vector_db', 'LearningDb_Output/vector_db.json')
     if not os.path.exists(vector_db_path):
-        print(f"[!] ERROR: {vector_db_path} not found.")
-        print("[!] Run these steps first:")
-        print("[!]   Step 1: python parse_and_chunk.py")
-        print("[!]   Step 2: python embed_local.py")
-        return
+        print("[!] Vector database not found: " + vector_db_path)
+        print("[!] Please run 'python embed_local.py' first to generate embeddings.")
+        sys.exit(1)
+        
+    try:
+        with open(vector_db_path, 'r', encoding='utf-8') as f:
+            vector_db = json.load(f)
+        print("[*] Knowledge Base: " + str(len(vector_db)) + " PDF Chunks Loaded.")
+    except Exception as e:
+        print("[!] Error loading vector database: " + str(e))
+        sys.exit(1)
 
-    with open(vector_db_path, "r", encoding="utf-8") as f:
-        vector_db = json.load(f)
+    # --- Main Interface ---
+    print("\n======================================================================")
+    print("=== AI Scan PDF - Spec Analyzer ===")
+    print("======================================================================")
+    print("Displaying config: Backend={}, API={}, LLM={}, Embedding={}".format(BACKEND_TYPE.upper(), API_BASE_URL, LLM_MODEL, EMBEDDING_MODEL))
+    print("Knowledge Base: {} PDF Chunks Loaded.".format(len(vector_db)))
 
-    print(f"\n{'='*70}")
-    print(f"=== AI Scan PDF - Spec Analyzer ===")
-    print(f"{'='*70}")
-    print(f"[*] Backend: {BACKEND_TYPE.upper()}")
-    print(f"[*] API Server: {API_BASE_URL}")
-    print(f"[*] LLM Model: {LLM_MODEL}")
-    print(f"[*] Embedding: {EMBED_MODEL}")
-    print(f"[*] Knowledge Base: {len(vector_db)} PDF Chunks Loaded.")
-    print(f"\n📋 Quick Help:")
-    print(f"   - Type your question in Thai or English")
-    print(f"   - Type 'exit' or 'quit' to stop")
-    print(f"   - Type 'help' for more options")
-    print(f"{'='*70}\n")
+    print("\n📋 Quick Help:")
+    print("   - Type your question in Thai or English")
+    print("   - Type 'exit' or 'quit' to stop")
+    print("   - Type 'help' for more options")
+    print("======================================================================")
+
+    # Warm-up: Send initial greeting to load the model
+    print("\n[*] Initializing LLM model...")
+    warmup_prompt = "สวัสดี! คุณพร้อมช่วยตอบคำถามหรือยัง? ตอบสั้นๆ เป็นภาษาไทย"
+    warmup_response = get_llm_response(
+        warmup_prompt,
+        LLM_MODEL,
+        MAX_TOKENS,
+        TEMPERATURE,
+        stream=False
+    )
+    if warmup_response:
+        print("[OK] LLM initialized: " + warmup_response.strip())
+    else:
+        print("[WARN] LLM warm-up failed, continuing anyway...")
 
     while True:
-        try:
-            query = input("[?] Your question: ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\n\n[!] Exiting...")
+        query = input("\n[?] Your question: ")
+        if query.lower() in ['exit', 'quit']:
             break
-            
-        if query.lower() in ['exit', 'quit', 'q']:
-            print("\n[+] Goodbye!\n")
-            break
-        
-        if query.lower() in ['help', 'h', '?']:
-            print("\n" + "="*50)
-            print("HELP - How to use:")
-            print("="*50)
-            print("1. Ask questions about your PDF documents")
-            print("2. The system will search relevant chunks")
-            print("3. AI will answer based on document content")
-            print("\nExamples:")
-            print("  - ระบบเบิกจ่ายงบประมาณทำอย่างไร")
-            print("  - What is the budget approval process?")
-            print("  - ขั้นตอนการตรวจสอบใบสำคัญ")
-            print("\nCommands:")
-            print("  - exit, quit, q : Exit the program")
-            print("  - help, h      : Show this help")
-            print("  - info, i      : Show system information")
-            print("="*50 + "\n")
+        elif query.lower() == 'help':
+            print("\nAvailable commands:")
+            print("  - type your question")
+            print("  - exit/quit: stop the program")
             continue
         
-        if query.lower() in ['info', 'i']:
-            print("\n" + "="*50)
-            print("SYSTEM INFORMATION")
-            print("="*50)
-            print(f"LLM Model: {LLM_MODEL}")
-            print(f"Embedding: {EMBED_MODEL}")
-            print(f"API Server: {API_BASE_URL}")
-            print(f"Chunks: {len(vector_db)}")
-            print(f"Status: Ready")
-            print("="*50 + "\n")
-            continue
-
-        print("[*] Searching documents...", end=" ", flush=True)
+        # Search for relevant chunks
         relevant_chunks = search_chunks(query, vector_db, top_k=TOP_K)
         
-        if not relevant_chunks:
-            print("[!] No relevant documents found.\n")
-            continue
+        # Construct prompt
+        context = "\n".join([f"Chunk {i+1}:\n{chunk['content']}\n" for i, chunk in enumerate(relevant_chunks)])
+        system_prompt = "You are an AI assistant analyzing technical documents. Answer the user's question based ONLY on the provided context. If the context does not contain the answer, state that you cannot find the information in the provided documents."
         
-        print(f"Found {len(relevant_chunks)} relevant chunk(s)")
+        final_prompt = "{}\n\nContext:\n{}\n\nUser Question:\n{}".format(system_prompt, context, query)
 
-        context = "\n---\n".join([c["content"] for c in relevant_chunks])
-        full_prompt = f"""You are an AI assistant analyzing Thai PDF documents.
-Using ONLY the context below, answer the question. 
-- Respond in Thai if the question is in Thai
-- Respond in English if the question is in English
-- Be concise and accurate
-- If the answer is not in the context, say "ไม่พบข้อมูลในเอกสาร" (Information not found in documents)
-
-CONTEXT:
-{context}
-
-QUESTION: {query}
-
-ANSWER:"""
-
-        print(f"[*] Analyzing with {LLM_MODEL}...")
-        answer = query_llm(full_prompt)
-
-        print(f"\n{'='*70}")
-        print(f"📄 AI ANALYSIS:")
-        print(f"{'='*70}")
-        print(answer)
-        print(f"{'='*70}\n")
+        # Get response from LLM
+        print("\n[*] Analyzing with {}...".format(LLM_MODEL))
+        response = get_llm_response(
+            final_prompt, 
+            LLM_MODEL, 
+            MAX_TOKENS, 
+            TEMPERATURE, 
+            stream=False # Set to True for streaming if implemented
+        )
+        
+        print("\n======================================================================")
+        print("AI ANALYSIS:")
+        print(response)
+        print("======================================================================")
 
 if __name__ == "__main__":
     main()

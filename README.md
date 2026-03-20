@@ -12,7 +12,7 @@
 
 **A privacy-first, local AI document analysis system for Thai and English PDFs.**
 
-🔗 **Repository:** https://github.com/tps2015gh/scan_pdf_thai
+🔗 **Repository:** https://github.com/tps2015gh/scan_pdf_thai2
 
 ---
 
