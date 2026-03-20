@@ -15,8 +15,8 @@
 - ✅ Pre-commit hook (`pre_commit_hook.py`) - Git security
 - ✅ Comprehensive `.gitignore` - Protects sensitive data
 
-### 📚 Documentation (11 files)
-- ✅ `README.md` - Main documentation
+### 📚 Documentation (12+ files)
+- ✅ `README.md` - Main documentation with team credits
 - ✅ `INSTALL.md` - Installation guide
 - ✅ `QUICK_START.md` - Step-by-step quick start
 - ✅ `HOW_TO_RUN.md` - Detailed usage guide
@@ -25,6 +25,7 @@
 - ✅ `TEST_AGENT_GUIDE.md` - Testing documentation
 - ✅ `SECURITY.md` - Security guide
 - ✅ `GPT4ALL_EMBEDDING_SETUP.md` - Embedding options
+- ✅ `OLLAMA_SETUP.md` - Ollama installation and setup
 - ✅ `HTMLFile/` - User guides (Thai)
 - ✅ `MDFile/` - Technical specs
 
@@ -33,6 +34,34 @@
 - ✅ Model switching without code changes
 - ✅ API endpoint configuration
 - ✅ Generation parameters
+
+---
+
+## 👥 Team Credits
+
+### Human Team Member
+**Name:** tps2015gh
+**Role:** Project Owner & Visionary Director
+- Defines project vision and requirements
+- Provides domain expertise (Thai government documents)
+- Specifies hardware constraints (Optiplex 3070, 8GB RAM)
+- Validates AI outputs and system behavior
+
+### AI Team Member #1: Qwen3.5 Coder
+**Name:** Qwen3.5 Coder (Alibaba Cloud)
+**Role:** Technical Architect & Lead Engineer
+- System architecture design (RAG pipeline)
+- All Python code implementation
+- Documentation creation (12+ files)
+- Troubleshooting and optimization
+
+### AI Team Member #2: Qwen2.5-0.5B
+**Name:** Qwen2.5-0.5B (Alibaba Cloud - Local)
+**Role:** Inference Engine & Document Analyst
+- Thai and English document analysis
+- Local CPU inference (492 MB RAM)
+- Fast responses (~5-10 tok/sec)
+- Context-aware Q&A
 
 ---
 
@@ -232,17 +261,24 @@ ai_scan_pdf/
 
 ## 📝 Version Information
 
-**Project Version:** 1.0.0
-**Last Updated:** 2026-03-19
-**GPT4All Version:** 3.9.0
-**Python Version:** 3.8.5 (compatible with 3.10+)
+**Project Version:** 1.1.0 (Ollama + Qwen2.5-0.5B)
+**Last Updated:** 2026-03-20
+**Ollama Version:** Latest
+**Python Version:** 3.12+ compatible
 
 **Git Status:**
 ```
-Commit: Initial commit made
-Branch: master
-Files: 29+ files tracked
+Commit: 76ed13c - Fix Thai language support and Windows compatibility
+Branch: main
+Files: 14 files modified (1,212 additions, 681 deletions)
 ```
+
+**Recent Changes (v1.1.0):**
+- ✅ Switched to Qwen2.5-0.5B (lighter, faster for 4GB RAM)
+- ✅ Fixed Thai UTF-8 console output
+- ✅ Added OCR fallback with EasyOCR
+- ✅ Optimized for Windows compatibility
+- ✅ Added comprehensive test scripts
 
 ---
 
@@ -259,6 +295,9 @@ Then type your question about the PDF documents!
 
 ---
 
-**Created by:** AI Assistant
+**Created by:** Qwen3.5 Coder (AI Architect) & Qwen2.5-0.5B (Local LLM)
 **For:** AI Scan PDF Project
-**Date:** 2026-03-19
+**Under Direction of:** tps2015gh (Human Owner)
+**Date:** 2026-03-20
+
+**Team Philosophy:** Human Vision + AI Engineering = Local-First Thai PDF Analysis

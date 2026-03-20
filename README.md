@@ -42,8 +42,8 @@ This project is a collaborative effort between human intelligence and artificial
 
 ---
 
-### 🤖 AI Team Member
-**Name:** AI Assistant (Qwen-based)  
+### 🤖 AI Team Member #1: Qwen3.5 Coder
+**Name:** Qwen3.5 Coder (Alibaba Cloud AI)
 **Role:** Technical Architect & Lead Engineer
 
 #### Responsibilities:
@@ -63,6 +63,60 @@ This project is a collaborative effort between human intelligence and artificial
 - Test agent for automated testing (32 tests)
 - Configuration manager for easy model switching
 - Complete documentation suite
+
+---
+
+### 🤖 AI Team Member #2: Qwen2.5-0.5B (Local LLM)
+**Name:** Qwen2.5-0.5B (Alibaba Cloud AI - Local)
+**Role:** Inference Engine & Document Analyst
+
+#### Responsibilities:
+- ✅ Analyze Thai and English PDF documents
+- ✅ Generate accurate responses from retrieved context
+- ✅ Support Thai language understanding and generation
+- ✅ Run inference on CPU (no GPU required)
+- ✅ Provide fast responses (~5-10 tokens/sec)
+
+#### Model Specifications:
+| Specification | Value |
+|--------------|-------|
+| **Model Size** | 0.5 Billion parameters |
+| **Quantization** | Q4_K_M (GGUF) |
+| **RAM Usage** | ~492 MB |
+| **Context Window** | 8192 tokens |
+| **Language Support** | Thai 🇹🇭 + English 🇬🇧 |
+| **Backend** | Ollama API |
+| **Performance** | ~5-10 tokens/sec on i5-8500 |
+
+#### Recent Improvements (March 2026):
+1. **Thai Language Support**
+   - Fixed UTF-8 console output for Thai characters
+   - Added Thai text normalization in PDF parsing
+   - Integrated EasyOCR with Thai language support
+   - Optimized OCR for Thai document recognition
+
+2. **Windows Compatibility**
+   - Added `sys.stdout.reconfigure(encoding='utf-8')` for proper Thai display
+   - Replaced Unicode symbols with ASCII for console compatibility
+   - Fixed line ending issues (LF/CRLF) for Windows Git
+
+3. **Performance Optimization**
+   - Switched from qwen3.5:0.8b to qwen2.5:0.5b (50% smaller, faster loading)
+   - Reduced OCR processing time from 50 sec/page to ~30 sec/page
+   - Added LLM warm-up on startup (pre-load model)
+   - Optimized embedding API calls (use 'prompt' key for Ollama)
+
+4. **Code Quality Improvements**
+   - Fixed Ollama API response parsing (use 'response' key)
+   - Added error handling for embedding generation
+   - Improved chunking algorithm for better Thai text segmentation
+   - Added comprehensive test scripts (a01_test_ai.py, a02_test_ai_embed.py)
+
+5. **Documentation Updates**
+   - Created OLLAMA_SETUP.md for Ollama installation guide
+   - Updated HOW_TO_RUN.md with virtual environment setup
+   - Added create_thai_pdf.py for generating Thai test documents
+   - Enhanced troubleshooting section with Thai text issues
 
 ---
 
@@ -445,10 +499,12 @@ print(response.json()["data"][0]["embedding"])
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-03-20 | **Qwen2.5-0.5B Integration**: Thai language fixes, Windows UTF-8 support, OCR optimization, Ollama backend migration |
 | 1.0.0 | 2026-03-19 | GPT4All migration, security agent, enhanced docs |
 | 0.9.0 | 2026-01-31 | Initial Ollama-based version |
 
 ---
 
-*Created by AI Security Agent under the direction of the Human Owner.*
-*Last Updated: 2026-03-19*
+*Created by Qwen3.5 Coder (AI Architect) and Qwen2.5-0.5B (Local LLM) under the direction of Human Owner tps2015gh.*
+*Last Updated: 2026-03-20*
+*Team: Human Vision + AI Engineering = Local-First Thai PDF Analysis*

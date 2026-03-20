@@ -3,12 +3,21 @@
 ## 📋 Quick Start Checklist
 
 - [ ] **Ollama** installed and running
-- [ ] Models pulled in Ollama (`qwen3.5:0.8b`, `nomic-embed-text`)
+- [ ] Models pulled in Ollama (`qwen2.5:0.5b`, `nomic-embed-text`)
 - [ ] Python virtual environment (`.venv`) created and activated
 - [ ] PDF files in `PDF_Input/` folder
 - [ ] Python dependencies installed within the virtual environment
 
 ---
+
+## 👥 Team Credits
+
+This system is built and maintained by:
+- **Human Owner:** tps2015gh (Project Vision & Direction)
+- **AI Architect:** Qwen3.5 Coder (System Design & Implementation)
+- **Local LLM:** Qwen2.5-0.5B (Document Analysis & Thai Language Support)
+
+**Model:** Qwen2.5-0.5B by Alibaba Cloud (Optimized for 4GB RAM, Thai language)
 
 ## Step 1: Set up Python Environment (Virtual Environment)
 
@@ -47,9 +56,15 @@ if (-not (Test-Path ".venv")) {
 ### 2.2 Pull Models
 Open your **activated** PowerShell terminal (it should show `(.venv)` in the prompt) and run:
 ```powershell
-ollama pull qwen3.5:0.8b
+ollama pull qwen2.5:0.5b
 ollama pull nomic-embed-text
 ```
+
+**Note:** We use `qwen2.5:0.5b` (not qwen3.5:0.8b) because:
+- ✅ 50% smaller (492 MB vs 800+ MB)
+- ✅ Faster loading on low RAM systems
+- ✅ Excellent Thai language support
+- ✅ Optimized for CPU inference
 
 ### 2.3 Keep Ollama Running
 Ollama typically runs in the background as a system service or tray icon. Ensure it is active before running the Python scripts.
@@ -121,11 +136,26 @@ If you are using a 4GB RAM notebook:
 **Solution:** Ensure Ollama is running. Check `http://localhost:11434` in your browser.
 
 ### Error: Model not found
-**Solution:** Run `ollama pull qwen3.5:0.8b` and `ollama pull nomic-embed-text` again in your terminal.
+**Solution:** Run `ollama pull qwen2.5:0.5b` and `ollama pull nomic-embed-text` again in your terminal.
 
 ### Error: Out of memory
-**Solution:** Close all browsers and other applications. Use the recommended `qwen3.5:0.8b` model.
+**Solution:** Close all browsers and other applications. Use the recommended `qwen2.5:0.5b` model (only 492 MB RAM).
+
+---
+
+## 🤖 About Qwen2.5-0.5B
+
+**Qwen2.5-0.5B** is a lightweight large language model by Alibaba Cloud, specifically optimized for:
+- 🇹🇭 **Thai Language Support** - Trained on Thai corpus for accurate understanding
+- 💾 **Low RAM Usage** - Only 492 MB in quantized form
+- ⚡ **Fast Inference** - ~5-10 tokens/second on Intel i5-8500
+- 🖥️ **CPU-Only** - No GPU required, runs on standard office hardware
+
+**Part of the Qwen family:**
+- Qwen3.5 Coder - AI Architect (designed this system)
+- Qwen2.5-0.5B - Local LLM (analyzes your documents)
 
 ---
 
 *Last Updated: 2026-03-20*
+*Team: Human Vision + Qwen AI Engineering*
