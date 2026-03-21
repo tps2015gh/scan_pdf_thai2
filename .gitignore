@@ -37,3 +37,6 @@ security_report.txt
 # Serve MD script and Ollama test script
 serve_md.py
 test_ollama.py
+
+# Ignore other specific input folders
+PDF_input_notuse/
