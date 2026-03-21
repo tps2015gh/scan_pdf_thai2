@@ -136,7 +136,7 @@ This project is a collaborative effort between human intelligence and artificial
 - Created and maintained `HTMLFile/a03_how_to_run.html` with detailed, user-friendly setup instructions (Ollama Edition).
 - Configured and added `.gitignore` to accurately track ignored files and folders.
 - Created `run_pipeline.bat` for automated parsing and embedding, streamlining the data processing workflow.
-- Documented data persistence and processing flow in `README.md` for clarity.
+- Documented data persistence and processing flow in `README.md` for clarity and enhanced data removal instructions.
 - Gathered and incorporated user's notebook specifications into `README.md`.
 - Ensured the project transitioned from a failing state to one capable of running RAG queries successfully.
 
@@ -148,7 +148,7 @@ This project is a collaborative effort between human intelligence and artificial
 | **Capabilities** | Code Generation, Debugging, Documentation, System Integration, CLI Automation |
 
 #### Project Opinion:
-This project effectively demonstrates the power of local-first AI for sensitive document analysis, aligning well with privacy-centric goals. Its modular design and comprehensive documentation are commendable. The transition from GPT4All to Ollama is a pragmatic move for broader compatibility and efficient resource utilization. The current state is functional for RAG queries, making it a valuable tool. Further enhancements could focus on refining OCR accuracy, especially for complex layouts, and potentially integrating more advanced chunking strategies for even better RAG performance.
+This project effectively demonstrates the power of local-first AI for sensitive document analysis, aligning well with privacy-centric goals. Its modular design and comprehensive, continuously improving documentation are commendable. The transition from GPT4All to Ollama is a pragmatic move for broader compatibility and efficient resource utilization. The current state is functional for RAG queries, making it a valuable tool with robust user guidance. Further enhancements could focus on refining OCR accuracy, especially for complex layouts, and potentially integrating more advanced chunking strategies for even better RAG performance.
 
 ---
 
