@@ -326,7 +326,10 @@ Understanding how data is processed and stored is crucial for managing your know
         *   Every time `embed_local.py` is executed, it reads *all* chunks present in `Temp_Output/chunks/`, generates embeddings for them, and then **completely overwrites** the `LearningDb_Output/vector_db.json` file.
         *   This means the `vector_db.json` will always represent the embeddings of the chunks that were in `Temp_Output/chunks/` at the time of the last execution of `embed_local.py`.
         *   To ensure your vector database is up-to-date with all changes (new PDFs, updated PDFs), you must run `parse_and_chunk.py` (to update chunks) and then `embed_local.py` (to regenerate the vector database).
-        *   **To remove data from the vector database (e.g., from old scan PDFs):** You must manually delete the corresponding chunk files from their respective subdirectories within `Temp_Output/chunks/`. After deleting the unwanted chunks, run `embed_local.py` again to regenerate the `LearningDb_Output/vector_db.json` with only the remaining chunks.
+        *   **To remove data from the knowledge base (both chunks and vector database):**
+            1.  **Remove Source PDF:** Delete the original PDF file(s) from the `PDF_Input/` directory that you no longer wish to include in your knowledge base.
+            2.  **Remove Chunks (Optional but Recommended):** Manually delete the corresponding subdirectory (e.g., `Temp_Output/chunks/<pdf_file_base_name>/`) containing the chunk files for the removed PDF(s). While `parse_and_chunk.py` won't re-create them if the source PDF is gone, this step ensures a clean `Temp_Output` directory.
+            3.  **Regenerate Vector Database:** Run `run_pipeline.bat` (or `python embed_local.py` if no new parsing is needed). This will ensure `LearningDb_Output/vector_db.json` is regenerated with only the remaining, desired chunks. Note that if you run `run_pipeline.bat`, `parse_and_chunk.py` will re-process all *existing* PDFs in `PDF_Input/` before `embed_local.py` regenerates the vector database.
 
 ---
 
