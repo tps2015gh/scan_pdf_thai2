@@ -303,6 +303,26 @@ ai_scan_pdf/
 └── ocr_test.py             OCR for scanned PDFs
 ```
 
+### 🔄 Data Persistence and Processing Flow
+
+Understanding how data is processed and stored is crucial for managing your knowledge base effectively.
+
+*   **PDF Parsing (`parse_and_chunk.py`)**:
+    *   **Input**: Reads PDF files from the `PDF_Input/` directory.
+    *   **Output**: Creates and stores text chunks in `Temp_Output/chunks/<pdf_file_base_name>/`. Each PDF gets its own subdirectory.
+    *   **Behavior**:
+        *   If `parse_and_chunk.py` is run multiple times with the same PDFs in `PDF_Input/`, the chunk files for those PDFs will be **overwritten** in their respective `Temp_Output/chunks/<pdf_file_base_name>/` subdirectories.
+        *   If new PDFs are added to `PDF_Input/`, new subdirectories and chunk files will be created for them without affecting previously processed PDFs.
+        *   If a PDF is removed from `PDF_Input/`, its corresponding chunk directory and files in `Temp_Output/chunks/` will **remain** until manually deleted.
+
+*   **Embedding Generation (`embed_local.py`)**:
+    *   **Input**: Collects *all* currently existing text chunks from `Temp_Output/chunks/` (across all processed PDFs).
+    *   **Output**: Generates a single vector database file, `LearningDb_Output/vector_db.json`.
+    *   **Behavior**:
+        *   Every time `embed_local.py` is executed, it reads *all* chunks present in `Temp_Output/chunks/`, generates embeddings for them, and then **completely overwrites** the `LearningDb_Output/vector_db.json` file.
+        *   This means the `vector_db.json` will always represent the embeddings of the chunks that were in `Temp_Output/chunks/` at the time of the last execution of `embed_local.py`.
+        *   To ensure your vector database is up-to-date with all changes (new PDFs, updated PDFs), you must run `parse_and_chunk.py` (to update chunks) and then `embed_local.py` (to regenerate the vector database).
+
 ---
 
 ## 🔒 Security Features
