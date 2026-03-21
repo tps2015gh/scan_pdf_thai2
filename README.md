@@ -120,6 +120,34 @@ This project is a collaborative effort between human intelligence and artificial
 
 ---
 
+### 🤖 AI Team Member #3: Gemini CLI
+**Name:** Gemini CLI (Google AI)
+**Role:** Project Troubleshooter & Integrator
+
+#### Responsibilities:
+- ✅ Debug and resolve critical runtime errors (e.g., Python dependency warnings, OCR initialization issues).
+- ✅ Update and maintain project documentation, ensuring clarity and accuracy for users.
+- ✅ Facilitate project setup and execution, guiding users through necessary steps.
+- ✅ Ensure overall project stability and readiness for RAG queries.
+
+#### Technical Contributions:
+- Identified and resolved `RequestsDependencyWarning` by guiding dependency upgrades.
+- Fixed `TypeError` in `parse_and_chunk.py` by correcting `easyocr.Reader()` arguments, enabling successful OCR fallback processing.
+- Created and maintained `HTMLFile/a03_how_to_run.html` with detailed, user-friendly setup instructions (Ollama Edition).
+- Ensured the project transitioned from a failing state to one capable of running RAG queries successfully.
+
+#### Model Specifications:
+| Specification | Value |
+|--------------|-------|
+| **Model**        | gemini-2.5-flash |
+| **Provider**     | Google AI        |
+| **Capabilities** | Code Generation, Debugging, Documentation, System Integration, CLI Automation |
+
+#### Project Opinion:
+This project effectively demonstrates the power of local-first AI for sensitive document analysis, aligning well with privacy-centric goals. Its modular design and comprehensive documentation are commendable. The transition from GPT4All to Ollama is a pragmatic move for broader compatibility and efficient resource utilization. The current state is functional for RAG queries, making it a valuable tool. Further enhancements could focus on refining OCR accuracy, especially for complex layouts, and potentially integrating more advanced chunking strategies for even better RAG performance.
+
+---
+
 ### 🤝 Collaboration Model
 ```
 Human (tps2015gh)                    AI (Assistant)
