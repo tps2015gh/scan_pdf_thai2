@@ -86,8 +86,9 @@ def get_ocr_reader():
         # Optimized for CPU speed
         ocr_reader = easyocr.Reader(
             ['th'],  # Thai only (faster than ['th', 'en'])
-            gpu=False,
-            quantized=True  # Use quantized models if available
+            gpu=False
+            # The 'quantized' argument was removed because it is not supported by all EasyOCR versions.
+            # Its availability can depend on the installed EasyOCR package version.
         )
     return ocr_reader
 

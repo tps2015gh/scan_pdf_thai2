@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Scan-PDF: How to Run (Ollama Edition)</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #0056b3; }
+        pre { background: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        code { font-family: monospace; }
+        ul { list-style-type: disc; margin-left: 20px; }
+        ol { margin-left: 20px; }
+        li { margin-bottom: 5px; }
+        strong { font-weight: bold; }
+        .note { background-color: #e0f7fa; border-left: 5px solid #00bcd4; padding: 10px; margin-bottom: 10px; }
+        .warning { color: #d9534f; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI-Scan-PDF: How to Run (Ollama Edition)</h1>
+        <p>This guide outlines the steps to get the AI-Scan-PDF project up and running, focusing on the Ollama backend as detailed in <code>HOW_TO_RUN.md</code>.</p>
+
+        <h2>1. Set up Python Environment (Virtual Environment)</h2>
+        <p>Using a virtual environment (<code>venv</code>) is highly recommended to isolate project dependencies and avoid conflicts.</p>
+
+        <h3>1.1 Create Virtual Environment</h3>
+        <p>Open your <strong>PowerShell terminal</strong> in your project directory (<code>C:\dev\scan_pdf_thai\</code>) and run:</p>
+        <pre><code># Navigate to project directory if you're not already there
+# cd C:\dev\scan_pdf_thai\
+
+# Create the virtual environment if it doesn't exist
+if (-not (Test-Path ".venv")) {
+    python -m venv .venv
+    Write-Host "[SUCCESS] Virtual environment '.venv' created."
+} else {
+    Write-Host "[INFO] Virtual environment '.venv' already exists."
+}
+</code></pre>
+
+        <h3>1.2 Activate Virtual Environment</h3>
+        <pre><code>.\.venv\Scripts\Activate.ps1
+</code></pre>
+        <div class="note">
+            <p>If you encounter an error related to script execution policy, you may need to run PowerShell as Administrator and execute <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>, then try activating again in your regular terminal.</p>
+            <p>Once activated, your terminal prompt will change to <code>(.venv) PS C:\dev\scan_pdf_thai></code>.</p>
+        </div>
+
+        <h2>2. Install & Setup Ollama</h2>
+
+        <h3>2.1 Download Ollama</h3>
+        <ol>
+            <li>Go to: <a href="https://ollama.com/" target="_blank">https://ollama.com/</a></li>
+            <li>Download and install Ollama for Windows.</li>
+        </ol>
+
+        <h3>2.2 Pull Models</h3>
+        <p>Open your <strong>activated</strong> PowerShell terminal (it should show <code>(.venv)</code> in the prompt) and run:</p>
+        <pre><code>ollama pull qwen2.5:0.5b
+ollama pull nomic-embed-text
+</code></pre>
+        <div class="note">
+            <p><strong>Note:</strong> We use <code>qwen2.5:0.5b</code> (not qwen3.5:0.8b) because it is 50% smaller, faster loading on low RAM systems, has excellent Thai language support, and is optimized for CPU inference.</p>
+        </div>
+
+        <h3>2.3 Keep Ollama Running</h3>
+        <p>Ollama typically runs in the background as a system service or tray icon. Ensure it is active before running the Python scripts.</p>
+
+        <h2>3. Install Project Dependencies</h2>
+        <p><strong>Ensure your virtual environment is active</strong> (prompt starts with <code>(.venv)</code>).</p>
+        <pre><code>pip install pdfplumber pythainlp tqdm requests numpy fitz easyocr Pillow markdown
+</code></pre>
+        <p>This installs all necessary libraries for the project within the isolated environment.</p>
+
+        <h2>4. Configure Backend (Optional)</h2>
+        <p>Check the <code>config.json</code> file, located in the project root (<code>C:\dev\scan_pdf_thai\config.json</code>), to ensure it points to Ollama (this should usually be set correctly):</p>
+        <pre><code class="language-json">"backend": {
+  "type": "ollama",
+  "api_base_url": "http://localhost:11434"
+}
+</code></pre>
+
+        <h2>5. Run the Pipeline</h2>
+        <p><strong>Ensure your virtual environment is active</strong> (<code>(.venv)</code> prompt) and you have placed your PDF files in the <code>PDF_Input/</code> folder.</p>
+
+        <h3>5.1 Parse PDFs to Chunks</h3>
+        <pre><code>python parse_and_chunk.py
+</code></pre>
+        <p>This breaks your PDFs into manageable text pieces.</p>
+
+        <h3>5.2 Generate Embeddings</h3>
+        <pre><code>python embed_local.py
+</code></pre>
+        <p>This uses <code>nomic-embed-text</code> via Ollama to create a searchable vector database.</p>
+
+        <h3>5.3 Query Your Documents</h3>
+        <pre><code>python main.py
+</code></pre>
+        <p>Ask questions about your documents in Thai or English.</p>
+
+        <h2>6. Optional: Testing & Security</h2>
+        <p>To verify your setup or scan for sensitive data:</p>
+        <pre><code># Verify LLM connection
+python a01_test_ai.py
+
+# Verify Embedding connection
+python a02_test_ai_embed.py
+
+# Scan for sensitive data in your project
+python security_agent.py
+</code></pre>
+        <div class="note">
+            <p>If you encounter Thai text display issues (encoding errors), run <code>chcp 65001</code> in your terminal before running the scripts.</p>
+        </div>
+
+        <h2>7. Troubleshooting</h2>
+        <h3>Error: Cannot activate virtual environment (<code>.\.venv\Scripts\Activate.ps1</code>)</h3>
+        <p><strong>Solution:</strong> Ensure you have run <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code> in an Administrator PowerShell at least once. Then try activating again in a regular PowerShell terminal.</p>
+
+        <h3>Error: Ollama Connection refused</h3>
+        <p><strong>Solution:</strong> Ensure Ollama is running. Check <a href="http://localhost:11434" target="_blank">http://localhost:11434</a> in your browser.</p>
+
+        <h3>Error: Model not found</h3>
+        <p><strong>Solution:</strong> Run <code>ollama pull qwen2.5:0.5b</code> and <code>ollama pull nomic-embed-text</code> again in your terminal.</p>
+
+        <h3>Error: Out of memory</h3>
+        <p><strong>Solution:</strong> Close all browsers and other applications. Use the recommended <code>qwen2.5:0.5b</code> model (only 492 MB RAM).</p>
+
+    </div>
+</body>
+</html>
