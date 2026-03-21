@@ -136,6 +136,8 @@ This project is a collaborative effort between human intelligence and artificial
 - Created and maintained `HTMLFile/a03_how_to_run.html` with detailed, user-friendly setup instructions (Ollama Edition).
 - Configured and added `.gitignore` to accurately track ignored files and folders.
 - Created `run_pipeline.bat` for automated parsing and embedding, streamlining the data processing workflow.
+- Documented data persistence and processing flow in `README.md` for clarity.
+- Gathered and incorporated user's notebook specifications into `README.md`.
 - Ensured the project transitioned from a failing state to one capable of running RAG queries successfully.
 
 #### Model Specifications:
@@ -202,6 +204,15 @@ The core philosophy of this project is **"Knowledge without Exposure."**
 | **OS** | Windows 11 Pro 64-bit | Required for GPT4All desktop app |
 | **Python** | 3.8.5 (32-bit) | Compatible with GPT4All API approach |
 | **GPU** | Intel UHD Graphics 630 | Not used - CPU inference only |
+
+### User's Notebook Specification
+
+| Component | Specification | Notes |
+|-----------|--------------|-------|
+| **OS** | Microsoft Windows 11 Home Single Language | Provided by user's `system_info.exe` |
+| **CPU** | Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz (6 Cores) | Provided by user's `system_info.exe` |
+| **RAM** | 7.87 GB (approx 8GB) | Provided by user's `system_info.exe` |
+| **GPU** | *Not provided/detected automatically* | User to add manually if available |
 
 ### RAM Usage by Model Size
 
