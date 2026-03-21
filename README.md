@@ -192,7 +192,7 @@ The core philosophy of this project is **"Knowledge without Exposure."**
 
 ## 🚀 Quick Start Guide
 
-**📖 Full step-by-step guide:** See [HOW_TO_RUN.md](./HOW_TO_RUN.md)
+**📖 Full step-by-step guide (Ollama Edition):** See [AI-Scan-PDF Quick Start Guide](./HTMLFile/a03_how_to_run.html)
 
 ### Prerequisites
 
