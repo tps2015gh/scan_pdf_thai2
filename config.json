@@ -73,8 +73,8 @@
   
   "parsing": {
     "_comment": "PDF Parsing Settings",
-    "chunk_size": 4000,
-    "chunk_overlap": 500,
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
     "normalize_thai": true
   },
   
