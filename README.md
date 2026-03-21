@@ -326,6 +326,7 @@ Understanding how data is processed and stored is crucial for managing your know
         *   Every time `embed_local.py` is executed, it reads *all* chunks present in `Temp_Output/chunks/`, generates embeddings for them, and then **completely overwrites** the `LearningDb_Output/vector_db.json` file.
         *   This means the `vector_db.json` will always represent the embeddings of the chunks that were in `Temp_Output/chunks/` at the time of the last execution of `embed_local.py`.
         *   To ensure your vector database is up-to-date with all changes (new PDFs, updated PDFs), you must run `parse_and_chunk.py` (to update chunks) and then `embed_local.py` (to regenerate the vector database).
+        *   **To remove data from the vector database (e.g., from old scan PDFs):** You must manually delete the corresponding chunk files from their respective subdirectories within `Temp_Output/chunks/`. After deleting the unwanted chunks, run `embed_local.py` again to regenerate the `LearningDb_Output/vector_db.json` with only the remaining chunks.
 
 ---
 
