@@ -134,6 +134,8 @@ This project is a collaborative effort between human intelligence and artificial
 - Identified and resolved `RequestsDependencyWarning` by guiding dependency upgrades.
 - Fixed `TypeError` in `parse_and_chunk.py` by correcting `easyocr.Reader()` arguments, enabling successful OCR fallback processing.
 - Created and maintained `HTMLFile/a03_how_to_run.html` with detailed, user-friendly setup instructions (Ollama Edition).
+- Configured and added `.gitignore` to accurately track ignored files and folders.
+- Created `run_pipeline.bat` for automated parsing and embedding, streamlining the data processing workflow.
 - Ensured the project transitioned from a failing state to one capable of running RAG queries successfully.
 
 #### Model Specifications:
@@ -224,61 +226,52 @@ The core philosophy of this project is **"Knowledge without Exposure."**
 
 ### Prerequisites
 
-1. **GPT4All Desktop Application v3.9.0+**
-2. **Python 3.8+** with required packages
-3. **PDF files** in `PDF_Input/` folder
+1. **Ollama Installed & Running**: Ensure Ollama is installed and running, and the necessary models (`qwen2.5:0.5b`, `nomic-embed-text`) are pulled. Refer to the [AI-Scan-PDF Quick Start Guide](./HTMLFile/a03_how_to_run.html) for detailed setup.
+2. **Python 3.8+** with required packages installed in an activated virtual environment.
+3. **PDF files** in `PDF_Input/` folder.
 
-### Step 1: Install GPT4All Desktop App
+### Automated Pipeline Execution
 
-**Download:** https://gpt4all.io/index.html
-
-1. Download and install GPT4All for Windows
-2. Launch the application
-3. Go to **Settings** (gear icon)
-4. Enable **"Local API Server"** (default port: 4891)
-5. Keep the application running in background
-
-### Step 2: Download Required Models
-
-In GPT4All app:
-
-**For Thai + English Support:**
-
-| Model | Purpose | Language | Download Size |
-|-------|---------|----------|---------------|
-| **unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF** | Main LLM | Thai 🇹🇭 + English 🇬🇧 | ~6 GB |
-| **Qwen2.5-7B-Instruct** | Alternative LLM | Thai 🇹🇭 + English 🇬🇧 | ~5 GB |
-| **Qwen/Qwen3-Embedding-0.6B-GGUF** | Embeddings | Thai 🇹🇭 + English 🇬🇧 | ~1.5 GB |
-
-**Recommended Model for Thai Documents:**
-- **Primary:** `unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF` - Latest DeepSeek R1 with Qwen3, excellent Thai understanding
-- **Alternative:** `Qwen2.5-7B-Instruct` - Faster, good Thai support
-
-**How to Download:**
-1. Open GPT4All app
-2. Click **"Download Models"**
-3. Search for model name
-4. Click **Download** button
-5. Wait for download to complete
-
-### Step 3: Install Python Dependencies
+For convenience, a batch script `run_pipeline.bat` is provided to automate the parsing and embedding steps.
 
 ```bash
-pip install pdfplumber pythainlp tqdm requests numpy fitz easyocr Pillow
+run_pipeline.bat
 ```
 
-### Step 4: Run the Pipeline
+This script will:
+1.  Activate your Python virtual environment.
+2.  Execute `python parse_and_chunk.py` to parse all PDFs in `PDF_Input/` and create text chunks.
+3.  Execute `python embed_local.py` to generate embeddings for all chunks and update the `LearningDb_Output/vector_db.json`.
+
+After the script completes, you can proceed to query your documents.
+
+### Manual Pipeline Execution (Detailed Steps)
+
+Alternatively, you can run each step manually:
+
+#### Step 1: Install Python Dependencies
+
+**Ensure your virtual environment is active** (prompt starts with `(.venv)`).
 
 ```bash
-# 1. Parse PDFs to chunks (5-10 minutes for 200+ pages)
+pip install pdfplumber pythainlp tqdm requests numpy fitz easyocr Pillow markdown
+```
+
+#### Step 2: Run the Pipeline (Manual)
+
+Ensure you have placed your PDF files in the `PDF_Input/` folder, then run these scripts in order:
+
+```bash
+# 1. Parse PDFs to chunks
 python parse_and_chunk.py
 
-# 2. Generate embeddings (GPT4All must be running!)
+# 2. Generate embeddings (Ollama must be running!)
 python embed_local.py
 
 # 3. Query your documents
 python main.py
 ```
+
 
 ---
 
