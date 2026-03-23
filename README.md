@@ -1,8 +1,4 @@
-# ⚠️ WARNING: Still Error / Under Development
-
-> **Status:** This project is still in development and may contain errors. Use at your own risk.
-
----
+ 
 
 # AI-Scan-PDF: Local-Inference Spec Analyzer
 
